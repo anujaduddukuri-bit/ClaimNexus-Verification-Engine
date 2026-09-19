@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #0D1512;
+    color: #E5DED0;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Research Editorial Panels */
+.nexus-panel {
+  background: rgba(21, 32, 26, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #304036;
+}
+
+.nexus-card {
+  background: #15201A;
+  border: 1px solid #304036;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nexus-card:hover {
+  border-color: #B46A45;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom Editorial Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0D1512;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #304036;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B46A45;
+}
+
+/* Flow Graph Styling */
+.react-flow__node {
+  border-radius: 8px;
+}
+.react-flow__background {
+  background: transparent !important;
+}
