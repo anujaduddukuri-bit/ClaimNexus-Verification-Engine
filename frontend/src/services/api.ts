@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { QueryRequest, ExecutionDetail, AnalyticsSummary, ProviderStatus } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+// Railway production backend
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://claimnexus-verification-engine-production.up.railway.app/api/v1';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
