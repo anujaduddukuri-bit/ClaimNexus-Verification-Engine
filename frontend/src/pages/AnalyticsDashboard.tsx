@@ -9,8 +9,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  PieChart,
-  Pie,
 } from 'recharts';
 import {
   BarChart3,
@@ -33,11 +31,11 @@ const CustomTooltip = ({ active, payload }: any) => {
     const data = payload[0];
 
     const name =
-      data.name ||
       data.payload?.name ||
+      data.name ||
       'Metric';
 
-    const value = data.value;
+    const value = data.value ?? 0;
 
     return (
       <div className="bg-[#0D1512] border-2 border-[#B46A45] p-3 rounded-xl shadow-2xl font-mono text-xs text-[#E5DED0] space-y-1 z-50">
@@ -67,6 +65,10 @@ export const AnalyticsDashboard: React.FC = () => {
 
   const [refreshing, setRefreshing] =
     useState<boolean>(false);
+
+  // ============================================================
+  // LOAD ANALYTICS
+  // ============================================================
 
   const loadAnalytics = async (isSilent = false) => {
     try {
@@ -98,6 +100,10 @@ export const AnalyticsDashboard: React.FC = () => {
       setRefreshing(false);
     }
   };
+
+  // ============================================================
+  // AUTO REFRESH
+  // ============================================================
 
   useEffect(() => {
     loadAnalytics();
@@ -134,13 +140,11 @@ export const AnalyticsDashboard: React.FC = () => {
   );
 
   /*
-   * If provider-specific latency is 0 but the provider
-   * has recorded runs, use the overall execution latency
-   * so the chart remains visible.
+   * Provider-specific latency can currently be returned
+   * as 0 by the backend even when a provider has runs.
    *
-   * Note:
-   * This is a visualization fallback. It does not claim
-   * that the individual provider actually took this exact time.
+   * In that situation, use the overall execution latency
+   * only as a visual fallback so the chart remains visible.
    */
 
   const modelData = [
@@ -189,7 +193,8 @@ export const AnalyticsDashboard: React.FC = () => {
 
   const totalVerdicts =
     verdictData.reduce(
-      (acc, item) => acc + item.value,
+      (acc, item) =>
+        acc + item.value,
       0
     );
 
@@ -208,11 +213,13 @@ export const AnalyticsDashboard: React.FC = () => {
 
         <div>
           <h1 className="text-xl font-bold font-sans text-[#E5DED0] tracking-wider flex items-center space-x-2">
+
             <BarChart3 className="w-5 h-5 text-[#B46A45]" />
 
             <span>
               VERIFICATION ANALYTICS
             </span>
+
           </h1>
 
           <p className="text-xs text-[#9A9B91]">
@@ -241,6 +248,7 @@ export const AnalyticsDashboard: React.FC = () => {
           </span>
 
         </div>
+
       </div>
 
       {/* ======================================================
@@ -250,7 +258,9 @@ export const AnalyticsDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
         {/* Total Executions */}
+
         <div className="bg-[#15201A] p-4 rounded-xl border border-[#304036] space-y-1 shadow-subtle">
+
           <span className="text-[10px] font-mono text-[#9A9B91] uppercase">
             Total Executions
           </span>
@@ -258,10 +268,13 @@ export const AnalyticsDashboard: React.FC = () => {
           <p className="text-2xl font-bold font-mono text-[#E5DED0]">
             {analytics?.total_executions || 0}
           </p>
+
         </div>
 
         {/* Average Latency */}
+
         <div className="bg-[#15201A] p-4 rounded-xl border border-[#304036] space-y-1 shadow-subtle">
+
           <span className="text-[10px] font-mono text-[#9A9B91] uppercase">
             Avg Latency
           </span>
@@ -272,10 +285,13 @@ export const AnalyticsDashboard: React.FC = () => {
             ).toFixed(2)}
             s
           </p>
+
         </div>
 
         {/* Confidence */}
+
         <div className="bg-[#15201A] p-4 rounded-xl border border-[#304036] space-y-1 shadow-subtle">
+
           <span className="text-[10px] font-mono text-[#9A9B91] uppercase">
             Avg Confidence Score
           </span>
@@ -286,10 +302,13 @@ export const AnalyticsDashboard: React.FC = () => {
             ).toFixed(1)}
             %
           </p>
+
         </div>
 
         {/* Evidence */}
+
         <div className="bg-[#15201A] p-4 rounded-xl border border-[#304036] space-y-1 shadow-subtle">
+
           <span className="text-[10px] font-mono text-[#9A9B91] uppercase">
             Evidence Items Evaluated
           </span>
@@ -297,6 +316,7 @@ export const AnalyticsDashboard: React.FC = () => {
           <p className="text-2xl font-bold font-mono text-[#C29B5B]">
             {totalEvidence}
           </p>
+
         </div>
 
       </div>
@@ -308,7 +328,7 @@ export const AnalyticsDashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* ====================================================
-            LATENCY CHART
+            RESEARCH AGENT LATENCY
         ==================================================== */}
 
         <div className="bg-[#15201A] p-6 rounded-xl border border-[#304036] space-y-4 shadow-subtle">
@@ -391,7 +411,11 @@ export const AnalyticsDashboard: React.FC = () => {
             ) : (
 
               <div className="h-full flex items-center justify-center font-mono text-xs text-[#9A9B91] text-center px-4">
-                No research agent runs recorded yet. Execute a claim verification to populate live latency metrics.
+
+                No research agent runs recorded yet.
+                Execute a claim verification to populate
+                live latency metrics.
+
               </div>
 
             )}
@@ -401,7 +425,7 @@ export const AnalyticsDashboard: React.FC = () => {
         </div>
 
         {/* ====================================================
-            VERDICT DISTRIBUTION
+            VERDICT CATEGORY DISTRIBUTION
         ==================================================== */}
 
         <div className="bg-[#15201A] p-6 rounded-xl border border-[#304036] space-y-4 shadow-subtle">
@@ -418,45 +442,56 @@ export const AnalyticsDashboard: React.FC = () => {
 
           {verdictData.length > 0 ? (
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div className="space-y-5">
 
-              {/* Pie / Donut Chart */}
+              {/* ==================================================
+                  VERDICT BAR CHART
+              ================================================== */}
 
-              <div className="h-56 min-h-[224px] w-full">
+              <div className="h-64 min-h-[256px] w-full">
 
                 <ResponsiveContainer
                   width="100%"
                   height="100%"
                   minWidth={0}
-                  minHeight={224}
+                  minHeight={256}
                 >
 
-                  <PieChart>
+                  <BarChart
+                    data={verdictData}
+                    layout="vertical"
+                    margin={{
+                      top: 10,
+                      right: 30,
+                      left: 10,
+                      bottom: 10,
+                    }}
+                  >
 
-                    <Pie
-                      data={verdictData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={55}
-                      outerRadius={85}
-                      paddingAngle={4}
-                      dataKey="value"
-                    >
+                    <XAxis
+                      type="number"
+                      stroke="#9A9B91"
+                      tick={{
+                        fontSize: 11,
+                        fill: '#E5DED0',
+                      }}
+                      allowDecimals={false}
+                      domain={[
+                        0,
+                        'dataMax + 1',
+                      ]}
+                    />
 
-                      {verdictData.map(
-                        (entry, index) => (
-
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.color}
-                            stroke="#0D1512"
-                            strokeWidth={2}
-                          />
-
-                        )
-                      )}
-
-                    </Pie>
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      width={135}
+                      stroke="#9A9B91"
+                      tick={{
+                        fontSize: 10,
+                        fill: '#E5DED0',
+                      }}
+                    />
 
                     <Tooltip
                       content={
@@ -464,81 +499,118 @@ export const AnalyticsDashboard: React.FC = () => {
                       }
                     />
 
-                  </PieChart>
+                    <Bar
+                      dataKey="value"
+                      radius={[
+                        0,
+                        6,
+                        6,
+                        0,
+                      ]}
+                      barSize={30}
+                    >
+
+                      {verdictData.map(
+                        (entry, index) => (
+
+                          <Cell
+                            key={`verdict-${index}`}
+                            fill={entry.color}
+                          />
+
+                        )
+                      )}
+
+                    </Bar>
+
+                  </BarChart>
 
                 </ResponsiveContainer>
 
               </div>
 
               {/* ==================================================
-                  SIDE LEGEND
+                  SUMMARY
               ================================================== */}
 
-              <div className="space-y-3 font-mono text-xs">
+              <div className="bg-[#0D1512] rounded-xl border border-[#304036] p-4">
 
-                <span className="text-[10px] text-[#9A9B91] uppercase block mb-1 border-b border-[#304036] pb-1">
-                  CATEGORY BREAKDOWN ({totalVerdicts} RUNS)
-                </span>
+                <div className="flex items-center justify-between mb-3">
 
-                {verdictData.map((v) => {
+                  <span className="text-[10px] text-[#9A9B91] uppercase font-mono tracking-wider">
+                    CATEGORY BREAKDOWN
+                  </span>
 
-                  const pct =
-                    totalVerdicts > 0
-                      ? (
-                          (v.value /
-                            totalVerdicts) *
-                          100
-                        ).toFixed(0)
-                      : '0';
+                  <span className="text-[10px] text-[#C29B5B] uppercase font-mono font-bold">
+                    {totalVerdicts} TOTAL RUNS
+                  </span>
 
-                  return (
+                </div>
 
-                    <div
-                      key={v.name}
-                      className="space-y-1"
-                    >
+                <div className="space-y-3">
 
-                      <div className="flex justify-between items-center text-[11px]">
+                  {verdictData.map((v) => {
 
-                        <span className="flex items-center space-x-2">
+                    const pct =
+                      totalVerdicts > 0
+                        ? (
+                            (v.value /
+                              totalVerdicts) *
+                            100
+                          ).toFixed(0)
+                        : '0';
 
-                          <span
-                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                    return (
+
+                      <div
+                        key={v.name}
+                        className="space-y-1.5"
+                      >
+
+                        <div className="flex justify-between items-center">
+
+                          <span className="flex items-center space-x-2">
+
+                            <span
+                              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                              style={{
+                                backgroundColor:
+                                  v.color,
+                              }}
+                            />
+
+                            <span className="text-[#E5DED0] font-mono text-[11px] font-semibold">
+                              {v.name}
+                            </span>
+
+                          </span>
+
+                          <span className="text-[#C29B5B] font-mono text-[11px] font-bold">
+                            {v.value} ({pct}%)
+                          </span>
+
+                        </div>
+
+                        <div className="w-full bg-[#15201A] rounded-full h-1.5 border border-[#304036] overflow-hidden">
+
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
                             style={{
+                              width: `${pct}%`,
                               backgroundColor:
                                 v.color,
                             }}
                           />
 
-                          <span className="text-[#E5DED0] font-semibold">
-                            {v.name}
-                          </span>
-
-                        </span>
-
-                        <span className="text-[#C29B5B] font-bold">
-                          {v.value} ({pct}%)
-                        </span>
+                        </div>
 
                       </div>
 
-                      <div className="w-full bg-[#0D1512] rounded-full h-1.5 border border-[#304036]">
+                    );
 
-                        <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor:
-                              v.color,
-                          }}
-                        />
+                  })}
 
-                      </div>
-
-                    </div>
-
-                  );
-                })}
+                </div>
 
               </div>
 
@@ -547,7 +619,10 @@ export const AnalyticsDashboard: React.FC = () => {
           ) : (
 
             <div className="h-64 flex items-center justify-center font-mono text-xs text-[#9A9B91] text-center px-4">
-              No verdict distribution data recorded yet. Run claim verifications to populate verdict metrics.
+
+              No verdict distribution data recorded yet.
+              Run claim verifications to populate verdict metrics.
+
             </div>
 
           )}
